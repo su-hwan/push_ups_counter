@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:push_ups_counter/config/values.dart';
+import 'package:push_ups_counter/screen/setting_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -8,17 +10,12 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-const Color mainBackgroundColor = Color(0xff00a989);
-const Color mainLineColor = Color(0xff5ed3c0);
-const Color mainLineColor2 = Color(0xff33bb9f);
-const Color mainFontColor = Color(0xffffffff);
-
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final double mainScreenWidth = MediaQuery.of(context).size.width * 0.95;
     return Scaffold(
-      backgroundColor: mainBackgroundColor,
+      backgroundColor: MyStyle.mainBackgroundColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -30,13 +27,13 @@ class _MainScreenState extends State<MainScreen> {
               height: 50,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(width: 2, color: mainLineColor)),
+                  border: Border.all(width: 2, color: MyStyle.mainLineColor)),
               child: Text(
                 'Push-ups counter',
                 style: GoogleFonts.montserrat(
                   fontSize: 25,
                   fontWeight: FontWeight.w500,
-                  color: mainFontColor,
+                  color: MyStyle.mainFontColor,
                   letterSpacing: 1.5,
                 ),
               ),
@@ -54,8 +51,9 @@ class _MainScreenState extends State<MainScreen> {
                     width: 150,
                     decoration: const BoxDecoration(
                       border: Border(
-                        //left: BorderSide(color: mainLineColor, width: 2),
-                        right: BorderSide(color: mainLineColor, width: 1),
+                        //left: BorderSide(color: MyStyle.mainLineColor, width: 2),
+                        right:
+                            BorderSide(color: MyStyle.mainLineColor, width: 1),
                       ),
                     ),
                     child: Text(
@@ -63,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.oswald(
                         fontSize: 80,
-                        color: mainFontColor,
+                        color: MyStyle.mainFontColor,
                       ),
                     ),
                   ),
@@ -72,8 +70,9 @@ class _MainScreenState extends State<MainScreen> {
                     width: 150,
                     decoration: const BoxDecoration(
                       border: Border(
-                        left: BorderSide(color: mainLineColor, width: 2),
-                        //right: BorderSide(color: mainLineColor, width: 2),
+                        left:
+                            BorderSide(color: MyStyle.mainLineColor, width: 2),
+                        //right: BorderSide(color: MyStyle.mainLineColor, width: 2),
                       ),
                     ),
                     child: Text(
@@ -81,7 +80,7 @@ class _MainScreenState extends State<MainScreen> {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.oswald(
                         fontSize: 80,
-                        color: mainFontColor,
+                        color: MyStyle.mainFontColor,
                       ),
                     ),
                   ),
@@ -107,7 +106,7 @@ class _MainScreenState extends State<MainScreen> {
                           padding: EdgeInsets.zero,
                           tooltip: 'Play',
                           icon: const Icon(Icons.play_circle_outline,
-                              color: mainLineColor, size: 90),
+                              color: MyStyle.mainLineColor, size: 90),
                         ),
                       ),
                       SizedBox(
@@ -117,7 +116,7 @@ class _MainScreenState extends State<MainScreen> {
                           tooltip: 'Stop',
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.stop_circle_outlined,
-                              color: mainLineColor, size: 90),
+                              color: MyStyle.mainLineColor, size: 90),
                         ),
                       ),
                       SizedBox(
@@ -127,22 +126,28 @@ class _MainScreenState extends State<MainScreen> {
                           tooltip: 'Reset',
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.lock_reset_outlined,
-                              color: mainLineColor, size: 90),
+                              color: MyStyle.mainLineColor, size: 90),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 60,
                   ),
                   Container(
                     width: mainScreenWidth * 0.7,
                     alignment: Alignment.centerRight,
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingScreen()),
+                        );
+                      },
                       padding: EdgeInsets.zero,
                       icon: const Icon(Icons.settings,
-                          color: mainLineColor, size: 50),
+                          color: MyStyle.mainLineColor, size: 50),
                     ),
                   ),
                 ],

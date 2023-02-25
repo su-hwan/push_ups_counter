@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:push_ups_counter/screen/main_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:push_ups_counter/config/values.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(),
+        primaryColor: MyStyle.mainBackgroundColor,
+        focusColor: MyStyle.mainBackgroundColor,
       ),
       home: const MainScreen(),
     );
