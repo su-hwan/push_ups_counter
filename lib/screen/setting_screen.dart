@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:push_ups_counter/config/values.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);
@@ -10,12 +11,33 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  double countInterval = 1.0;
   FocusNode textFocus = FocusNode();
+  final TextEditingController _intervalInputController =
+      TextEditingController();
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _prefs
+        .then((SharedPreferences prefs) =>
+            prefs.getDouble('push-ups.interval') ?? 0.0)
+        .then((double interval) {
+      print('interval : $interval');
+      if (interval == 0) {
+        _intervalInputController.text = '1';
+      } else if (interval % 1 != 0) {
+        _intervalInputController.text = interval.toString();
+      } else {
+        _intervalInputController.text = interval.toInt().toString();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final double mainScreenWidth = MediaQuery.of(context).size.width * 0.95;
-    final intervalInputController = TextEditingController(text: countInterval.toString());
 
     return Scaffold(
         //backgroundColor: MyStyle.mainBackgroundColor,
@@ -33,19 +55,20 @@ class _SettingScreenState extends State<SettingScreen> {
         ),
         body: GestureDetector(
           onTap: () {
+            //print('onTap............');
             //FocusScope.of(context).unfocus();
             textFocus.unfocus();
           },
           child: Center(
             child: Container(
               width: mainScreenWidth * 0.90,
-              height: 120,
+              //height: 120,
               padding: const EdgeInsets.only(right: 30),
               // decoration: BoxDecoration(
               //   border: Border.all(color: Colors.black54, width: 0),
               // ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -73,10 +96,10 @@ class _SettingScreenState extends State<SettingScreen> {
                         width: 70,
                         height: 30,
                         child: TextField(
-                          onChanged: (val) {
-                            print(val);
-                          },
-                          controller: intervalInputController,
+                          // onChanged: (val) {
+                          //   print(val);
+                          // },
+                          controller: _intervalInputController,
                           maxLength: 5,
                           textAlign: TextAlign.center,
                           focusNode: textFocus,
@@ -102,16 +125,25 @@ class _SettingScreenState extends State<SettingScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(
+                    height: 30,
+                  ),
                   Container(
                     alignment: Alignment.centerRight,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        if (intervalInputController.text == null) return;
-                        double interval = double.parse(intervalInputController.text);
-                        print('interval : $interval');
+                        if (_intervalInputController.text == '') return;
+                        _prefs.then((SharedPreferences prefs) {
+                          prefs.setDouble('push-ups.interval',
+                              double.parse(_intervalInputController.text));
+                        });
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Saved count interval')),
+                        );
                       },
-                      icon: Icon(Icons.save),
-                      label: Text('Save'),
+                      icon: const Icon(Icons.save),
+                      label: const Text('Save'),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(
                             MyStyle.mainBackgroundColor),

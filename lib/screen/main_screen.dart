@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:push_ups_counter/config/values.dart';
 import 'package:push_ups_counter/screen/setting_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -11,6 +14,34 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  int _count1 = 0;
+  int _count2 = 0;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  double _interval = 0;
+  late Timer _timer;
+  bool _isPlaying = false;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getInterval();
+  }
+
+  void _getInterval() {
+    _prefs
+        .then((SharedPreferences prefs) =>
+    prefs.getDouble('push-ups.interval') ?? 1.0)
+        .then((double interval) {
+      _interval = interval;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final double mainScreenWidth = MediaQuery.of(context).size.width * 0.95;
@@ -57,7 +88,7 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                     ),
                     child: Text(
-                      '11',
+                      _count1.toString(),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.oswald(
                         fontSize: 80,
@@ -76,7 +107,7 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                     ),
                     child: Text(
-                      '99',
+                      _count2.toString(),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.oswald(
                         fontSize: 80,
@@ -102,17 +133,25 @@ class _MainScreenState extends State<MainScreen> {
                       SizedBox(
                         width: 95,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            !_isPlaying ? _start() : _pause();
+                          },
                           padding: EdgeInsets.zero,
                           tooltip: 'Play',
-                          icon: const Icon(Icons.play_circle_outline,
-                              color: MyStyle.mainLineColor, size: 90),
+                          icon: Icon(
+                              !_isPlaying
+                                  ? Icons.play_circle_outline
+                                  : Icons.pause_circle_outline,
+                              color: MyStyle.mainLineColor,
+                              size: 90),
                         ),
                       ),
                       SizedBox(
                         width: 95,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _stop();
+                          },
                           tooltip: 'Stop',
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.stop_circle_outlined,
@@ -122,7 +161,9 @@ class _MainScreenState extends State<MainScreen> {
                       SizedBox(
                         width: 95,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _reset();
+                          },
                           tooltip: 'Reset',
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.lock_reset_outlined,
@@ -157,5 +198,43 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+
+  void _start() {
+    setState(() {
+      _isPlaying = true;
+      _count1 = 0;
+    });
+    _timer = Timer.periodic(Duration(milliseconds: (_interval * 1000).toInt()),
+        (timer) {
+      setState(() {
+        _count1++;
+        _count2++;
+      });
+    });
+  }
+
+  void _pause() {
+    _timer?.cancel();
+    setState(() {
+      _isPlaying = false;
+    });
+  }
+
+  void _stop() {
+    _timer?.cancel();
+    setState(() {
+      _isPlaying = false;
+    });
+  }
+
+  void _reset() {
+    _getInterval();
+    setState(() {
+      _isPlaying = false;
+      _timer?.cancel();
+      _count1 = 0;
+      _count2 = 0;
+    });
   }
 }
