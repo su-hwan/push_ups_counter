@@ -24,7 +24,7 @@ class _SettingScreenState extends State<SettingScreen> {
         .then((SharedPreferences prefs) =>
             prefs.getDouble('push-ups.interval') ?? 0.0)
         .then((double interval) {
-      print('interval : $interval');
+      //print('interval : $interval');
       if (interval == 0) {
         _intervalInputController.text = '1';
       } else if (interval % 1 != 0) {

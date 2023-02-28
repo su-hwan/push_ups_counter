@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   int _count2 = 0;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   double _interval = 0;
-  late Timer _timer;
+  Timer? _timer;
   bool _isPlaying = false;
 
   @override
@@ -178,17 +178,40 @@ class _MainScreenState extends State<MainScreen> {
                   Container(
                     width: mainScreenWidth * 0.7,
                     alignment: Alignment.centerRight,
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SettingScreen()),
-                        );
-                      },
-                      padding: EdgeInsets.zero,
-                      icon: const Icon(Icons.settings,
-                          color: MyStyle.mainLineColor, size: 50),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+
+                          },
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.save,
+                              color: MyStyle.mainLineColor, size: 50),
+                        ),
+                        const SizedBox(width: 20,),
+                        IconButton(
+                          onPressed: () {
+
+                          },
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.list_alt,
+                              color: MyStyle.mainLineColor, size: 50),
+                        ),
+                        const SizedBox(width: 20,),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SettingScreen()),
+                            );
+                          },
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.settings,
+                              color: MyStyle.mainLineColor, size: 50),
+                        ),
+                      ],
                     ),
                   ),
                 ],
