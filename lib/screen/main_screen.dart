@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:push_ups_counter/config/values.dart';
+import 'package:push_ups_counter/model/pushups_model.dart';
+import 'package:push_ups_counter/screen/pushups_Statistics_screen.dart';
 import 'package:push_ups_counter/screen/setting_screen.dart';
+import 'package:push_ups_counter/service/pushups_file_io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreen extends StatefulWidget {
@@ -16,6 +19,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _count1 = 0;
   int _count2 = 0;
+  final List<int> _countSets = [];
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   double _interval = 0;
   Timer? _timer;
@@ -36,7 +40,7 @@ class _MainScreenState extends State<MainScreen> {
   void _getInterval() {
     _prefs
         .then((SharedPreferences prefs) =>
-    prefs.getDouble('push-ups.interval') ?? 1.0)
+            prefs.getDouble('push-ups.interval') ?? 1.0)
         .then((double interval) {
       _interval = interval;
     });
@@ -150,7 +154,7 @@ class _MainScreenState extends State<MainScreen> {
                         width: 95,
                         child: IconButton(
                           onPressed: () {
-                            _stop();
+                            _pause();
                           },
                           tooltip: 'Stop',
                           padding: EdgeInsets.zero,
@@ -182,23 +186,31 @@ class _MainScreenState extends State<MainScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          onPressed: () {
-
-                          },
+                          onPressed: () => savePopup(),
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.save,
                               color: MyStyle.mainLineColor, size: 50),
                         ),
-                        const SizedBox(width: 20,),
+                        const SizedBox(
+                          width: 20,
+                        ),
                         IconButton(
                           onPressed: () {
-
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const PushupsStatisticsScreen()),
+                            );
+                            //await PushupsFileIO().load();
                           },
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.list_alt,
                               color: MyStyle.mainLineColor, size: 50),
                         ),
-                        const SizedBox(width: 20,),
+                        const SizedBox(
+                          width: 20,
+                        ),
                         IconButton(
                           onPressed: () {
                             Navigator.push(
@@ -238,13 +250,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _pause() {
-    _timer?.cancel();
-    setState(() {
-      _isPlaying = false;
-    });
-  }
-
-  void _stop() {
+    _countSets.add(_count1);
     _timer?.cancel();
     setState(() {
       _isPlaying = false;
@@ -254,10 +260,43 @@ class _MainScreenState extends State<MainScreen> {
   void _reset() {
     _getInterval();
     setState(() {
+      _countSets.clear();
       _isPlaying = false;
       _timer?.cancel();
       _count1 = 0;
       _count2 = 0;
     });
+  }
+
+  void savePopup() {
+    if (_count2 == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Do the push-up count first'),
+      ));
+      return;
+    }
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Save Push-ups Data'),
+        //content: const Text('AlertDialog description'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'Cancel'),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await PushupsFileIO().save(PushupsModel(
+                  saveTime: DateTime.now(),
+                  count: _count2,
+                  countSets: _countSets));
+              Navigator.pop(context, 'OK');
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }
